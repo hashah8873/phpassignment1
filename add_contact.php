@@ -1,39 +1,53 @@
 <?php
-include 'db.php'; // Connect to the database
+include 'db_connect.php';
 
-// Check if form is submitted
-if (isset($_POST['submit'])) {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
 
-    // Insert contact into database
-    mysqli_query($conn, "INSERT INTO contacts (name, email, phone) VALUES ('$name', '$email', '$phone')");
+    $sql = "INSERT INTO contacts (name, email, phone) VALUES ('$name', '$email', '$phone')";
 
-    // Redirect to index page
-    header("Location: index.php");
-    exit();
+    if (mysqli_query($conn, $sql)) {
+        header("Location: index.php");
+        exit();
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
 }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Contact</title>
+    <title>Add New Contact</title>
+    <style>
+        form { width: 300px; margin: 50px auto; }
+        label { display: block; margin-top: 10px; }
+        input { width: 100%; padding: 5px; }
+        button { margin-top: 15px; padding: 5px 10px; }
+    </style>
 </head>
 <body>
 
 <h2 style="text-align:center;">Add New Contact</h2>
 
-<form method="post" style="width:300px; margin:auto;">
-    Name:<br>
-    <input type="text" name="name" required><br><br>
-    Email:<br>
-    <input type="email" name="email" required><br><br>
-    Phone:<br>
-    <input type="text" name="phone" required><br><br>
-    <input type="submit" name="submit" value="Add Contact">
+<form method="post" action="add_contact.php">
+    <label>Name:</label>
+    <input type="text" name="name" required>
+
+    <label>Email:</label>
+    <input type="email" name="email" required>
+
+    <label>Phone:</label>
+    <input type="text" name="phone" required>
+
+    <button type="submit">Save Contact</button>
 </form>
+
+<div style="text-align:center; margin-top:20px;">
+    <a href="index.php">Back to Contacts List</a>
+</div>
 
 </body>
 </html>

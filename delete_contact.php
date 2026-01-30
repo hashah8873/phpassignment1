@@ -1,13 +1,20 @@
 <?php
-include 'db.php'; // Connect to the database
+include 'db_connect.php';
 
-// Get the contact ID from URL
-$id = $_GET['id'];
+if (!isset($_GET['id'])) {
+    header("Location: index.php");
+    exit();
+}
 
-// Delete contact from database
-mysqli_query($conn, "DELETE FROM contacts WHERE id=$id");
+$id = intval($_GET['id']);
 
-// Redirect to index page
-header("Location: index.php");
-exit();
+// حذف جهة الاتصال
+$sql = "DELETE FROM contacts WHERE id = $id";
+
+if (mysqli_query($conn, $sql)) {
+    header("Location: index.php");
+    exit();
+} else {
+    echo "Error deleting contact: " . mysqli_error($conn);
+}
 ?>

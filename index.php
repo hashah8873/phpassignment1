@@ -1,5 +1,7 @@
 <?php
-include 'db.php'; // Connect to the database
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+include 'db_connect.php';
 
 // Fetch all contacts
 $result = mysqli_query($conn, "SELECT * FROM contacts");
@@ -33,17 +35,24 @@ $result = mysqli_query($conn, "SELECT * FROM contacts");
         <th>Action</th>
     </tr>
 
-    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-    <tr>
-        <td><?php echo $row['id']; ?></td>
-        <td><?php echo $row['name']; ?></td>
-        <td><?php echo $row['email']; ?></td>
-        <td><?php echo $row['phone']; ?></td>
-        <td>
-            <a href="delete_contact.php?id=<?php echo $row['id']; ?>">Delete</a>
-        </td>
-    </tr>
-    <?php } ?>
+    <?php if (mysqli_num_rows($result) > 0): ?>
+        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+        <tr>
+            <td><?php echo $row['id']; ?></td>
+            <td><?php echo $row['name']; ?></td>
+            <td><?php echo $row['email']; ?></td>
+            <td><?php echo $row['phone']; ?></td>
+            <td>
+                <a href="edit_contact.php?id=<?php echo $row['id']; ?>">Edit</a> |
+                <a href="delete_contact.php?id=<?php echo $row['id']; ?>">Delete</a>
+            </td>
+        </tr>
+        <?php } ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="5" style="text-align:center;">No contacts found</td>
+        </tr>
+    <?php endif; ?>
 
 </table>
 
