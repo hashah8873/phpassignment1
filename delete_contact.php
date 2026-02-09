@@ -15,6 +15,6 @@ if (mysqli_query($conn, $sql)) {
     header("Location: index.php");
     exit();
 } else {
-    echo "Error deleting contact: " . mysqli_error($conn);
+    die("Error deleting contact: " . mysqli_error($conn));
 }
 ?>

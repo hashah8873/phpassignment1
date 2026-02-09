@@ -1,10 +1,16 @@
 <?php
-error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 include 'db_connect.php';
 
-// Fetch all contacts
-$result = mysqli_query($conn, "SELECT * FROM contacts");
+// جلب كل جهات الاتصال مع اسم التصنيف
+$sql = "SELECT contacts.*, categories.category_name
+        FROM contacts
+        LEFT JOIN categories ON contacts.category_id = categories.category_id";
+$result = mysqli_query($conn, $sql);
+if (!$result) die("SQL Error: " . mysqli_error($conn));
 ?>
 
 <!DOCTYPE html>
@@ -12,10 +18,11 @@ $result = mysqli_query($conn, "SELECT * FROM contacts");
 <head>
     <title>Contact Manager</title>
     <style>
-        table { border-collapse: collapse; width: 70%; margin: 20px auto; }
+        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
         th, td { border: 1px solid #000; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         a { text-decoration: none; color: blue; }
+        img { border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -32,28 +39,36 @@ $result = mysqli_query($conn, "SELECT * FROM contacts");
         <th>Name</th>
         <th>Email</th>
         <th>Phone</th>
+        <th>Category</th>
+        <th>Image</th>
         <th>Action</th>
     </tr>
 
-    <?php if (mysqli_num_rows($result) > 0): ?>
-        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+    <?php if ($result->num_rows > 0): ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
-            <td><?php echo $row['id']; ?></td>
-            <td><?php echo $row['name']; ?></td>
-            <td><?php echo $row['email']; ?></td>
-            <td><?php echo $row['phone']; ?></td>
+            <td><?= $row['id'] ?></td>
+            <td><?= $row['name'] ?></td>
+            <td><?= $row['email'] ?></td>
+            <td><?= $row['phone'] ?></td>
+            <td><?= $row['category_name'] ?></td>
             <td>
-                <a href="edit_contact.php?id=<?php echo $row['id']; ?>">Edit</a> |
-                <a href="delete_contact.php?id=<?php echo $row['id']; ?>">Delete</a>
+                <?php if(!empty($row['image_path'])): ?>
+                    <img src="<?= $row['image_path'] ?>" width="50" height="50">
+                <?php endif; ?>
+            </td>
+            <td>
+                <a href="contact_details.php?id=<?= $row['id'] ?>">View</a> |
+                <a href="edit_contact.php?id=<?= $row['id'] ?>">Edit</a> |
+                <a href="delete_contact.php?id=<?= $row['id'] ?>">Delete</a>
             </td>
         </tr>
-        <?php } ?>
+        <?php endwhile; ?>
     <?php else: ?>
         <tr>
-            <td colspan="5" style="text-align:center;">No contacts found</td>
+            <td colspan="7" style="text-align:center;">No contacts found</td>
         </tr>
     <?php endif; ?>
-
 </table>
 
 </body>
